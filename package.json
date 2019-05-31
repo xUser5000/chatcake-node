@@ -1,0 +1,21 @@
+{
+  "name": "chatcake-node",
+  "version": "1.0.0",
+  "description": "ChatCake Socket.io server with Node.js + Express",
+  "main": "www/bin.js",
+  "author": "Abdallah Ahmed",
+  "license": "MIT",
+  "scripts": {
+    "start": "node www/bin",
+    "start:dev": "nodemon www/bin"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.5.11",
+    "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "jslint": "^0.12.1"
+  }
+}
