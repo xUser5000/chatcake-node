@@ -1,26 +1,36 @@
 const http = require('http');
 const jwtService = require('./service/jwtService');
 const socketIo = require('socket.io');
+const SocketService = require('./service/SocketService')
 
 // establish the db connection
 require('./config/Mongo');
 
-const server = http.createServer((req, res) => {
-    res.end("Hello World");
-});
-
+// server configuration
+const server = http.createServer();
 const io = socketIo(server);
 
 io.on('connection', socket => {
 
     console.log(`User ${socket.id} has connected`);
 
-    socket.on('authorize', data => {
-        jwtService.verifyToken(data.token).then(() => {
-            
-            socket.emit('authorized');
+    socket.on('authorize', token => {
+        jwtService.verifyToken(token).then(username => {
+            console.log(`${username} has authenticated....`)
+            socket.username = username;
+            socket.emit('authorized', { message: 'You are Authorized, now you can make requests' });
 
-        }).catch(error => socket.emit('error', { error }));
+            // Here is the business logic:
+
+            // subscribe user to his rooms
+            SocketService.subscribe(socket);
+
+            // listen to send message event ----------- data: {roomId: string, content: string }
+            socket.on('message', data => SocketService.sendMessage(socket, data));
+
+        }).catch(error => {
+            console.error(error)
+        });
     });
 });
 

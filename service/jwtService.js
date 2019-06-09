@@ -8,18 +8,24 @@ module.exports = class {
     // verify the token
     static verifyToken (token) {
         return new Promise((resolve, reject) => {
-            if (token === null || token === "") reject('Token was not provided');
+            if (token === null || token === "") return reject('Token was not provided');
    
-            jwt.verify(token, TOKEN_SECRET, (err, decoded) => {
-                if (err) reject('Token is not valid');
+            jwt.verify(token, TOKEN_SECRET, { algorithms: ['HS512'] }, (err, user) => {
+                if (err) {
+                    console.error(err);
+                    return reject('Token is not valid');
+                }
 
-                invalidToken.findOne({ content: token }).then(res => {
-
-                    return (res === null) ? resolve() : reject('Token is not valid');
-
-                }).catch(err => console.error(err));
-
+                invalidToken.findOne({ content: token }, (err, res) => {
+                    if (err) return console.error(err)
+                    return (res === null) ? resolve(user.sub) : reject('Token is not valid');
+                })
             });
         })
+    }
+
+    // decode the token
+    static decodeToken (token) {
+        
     }
 }
